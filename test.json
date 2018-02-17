@@ -1,0 +1,6 @@
+{
+  "cmds": [
+    "npm init -y",
+    "npm install debug"
+  ]
+}

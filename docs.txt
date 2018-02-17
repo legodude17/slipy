@@ -1,0 +1,13 @@
+Slipy
+
+Usage:
+ - slipy build
+ - slipy new
+ - slipy watch
+ - slipy run
+
+Commands:
+ - slipy build [mode]: build app in [mode]
+ - slipy new [template]: create new app from [template]
+ - slipy watch [port]: create server on [port] and watch files
+ - slipy run [port]: create server on [port]

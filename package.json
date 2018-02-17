@@ -2,7 +2,10 @@
   "name": "slipy",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/slipy.js",
+  "bin": {
+    "slipy": "index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,5 +21,15 @@
   "bugs": {
     "url": "https://github.com/legodude17/slipy/issues"
   },
-  "homepage": "https://github.com/legodude17/slipy#readme"
+  "homepage": "https://github.com/legodude17/slipy#readme",
+  "dependencies": {
+    "del": "^3.0.0",
+    "execa": "^0.9.0",
+    "globby": "^8.0.0",
+    "inquirer": "^5.1.0",
+    "minimist": "^1.2.0",
+    "pify": "^3.0.0",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {}
 }
