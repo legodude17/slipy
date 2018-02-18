@@ -1,7 +1,7 @@
 const get = require("../util/get");
 const fs = require("pify")(require("fs"));
 const execa = require('execa');
-const serial = require('../util/promiseutils').serial;
+const serial = require('../util/promises').serial;
 
 module.exports = function (opts) {
   return fs.mkdir(opts.name)

@@ -28,15 +28,15 @@ Object.assign(exports, {
     prompt(require("./new/questions")).then(require("./new"));
   },
   run(args, options) {
-
+    // TODO: Start server that live-compiles
   },
   build(args, options) {
-
+    // TODO: Build to a dir, with optional server
   },
   watch(args, options) {
-
+    // TODO: Build to a dir, recompile on change
   },
   install(args, options) {
-
+    // TODO: Install plugin and init in package.json
   }
 });
