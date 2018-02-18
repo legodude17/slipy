@@ -4,7 +4,7 @@ const loadPlugins = require('./load');
 
 module.exports = function () {
   return fs.readFile('package.json')
-    .then(buf => JSON.parse(buf.toString).slipy)
+    .then(buf => JSON.parse(buf.toString()).slipy)
     .then(getPlugins)
     .then(loadPlugins);
 }

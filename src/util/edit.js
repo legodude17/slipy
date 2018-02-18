@@ -6,5 +6,5 @@ module.exports = function (path, fn) {
 };
 
 module.exports.json = function (path, fn) {
-  return edit(path, str => JSON.stringify(fn(JSON.parse(str))));
+  return module.exports(path, str => JSON.stringify(fn(JSON.parse(str)), ' ', 2));
 }

@@ -9,6 +9,7 @@ module.exports = function (plugins) {
       plugins[i][j] = loadPlugin(p);
     });
   });
+  return plugins;
 }
 
 function loadPlugin(p) {

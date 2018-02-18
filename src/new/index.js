@@ -5,20 +5,15 @@ module.exports = function(opts) {
   const d = done(opts);
   switch (opts.type) {
     case 'blank':
-      fs.mkdir(opts.name).then(d, err);
-      break;
+      return fs.mkdir(opts.name).then(d, err);
     case 'basic':
-      require("./basic.js")(opts).then(d, err);
-      break;
+      return require("./basic.js")(opts).then(d, err);
     case 'json':
-      require('./json.js')(opts).then(d, err);
-      break;
+      return require('./json.js')(opts).then(d, err);
     case 'npm':
-      require('./npm.js')(opts).then(d, err);
-      break;
+      return require('./npm.js')(opts).then(d, err);
     case 'git':
-      require('./git.js')(opts).then(d, err);
-      break;
+      return require('./git.js')(opts).then(d, err);
     default:
       throw new Error(opts.type);
   }

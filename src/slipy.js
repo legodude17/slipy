@@ -1,31 +1,28 @@
 const fs = require("fs");
 const prompt = require("inquirer").prompt;
 
+function done() {
+  console.log("Check! Yay!");
+}
+
+function err(err) {
+  console.error("ERROR:", err);
+}
+
 exports.help = () => console.log(fs.readFileSync("docs.txt", "utf-8"));
 
 exports.cli = function (argv) {
-  switch (argv._.shift()) {
-    case 'new':
-      exports.new(argv._, argv);
-      break;
-    case 'run':
-      exports.run(argv._, argv);
-      break;
-    case 'build':
-      exxports.build(argv._, argv);
-      break;
-    case 'watch':
-      exports.watch(argv._, argv);
-      break;
-    default:
-      exports.help();
-      break;
+  const command = argv._.shift();
+  if (exports[command]) {
+    return exports[command](argv._, argv).then(done, err);
+  } else {
+    return exports.help();
   }
 };
 
 Object.assign(exports, {
   ['new'](args, options) {
-    prompt(require("./new/questions")).then(require("./new"));
+    return prompt(require("./new/questions")).then(require("./new"));
   },
   run(args, options) {
     // TODO: Start server that live-compiles
@@ -37,6 +34,9 @@ Object.assign(exports, {
     // TODO: Build to a dir, recompile on change
   },
   install(args, options) {
-    prompt(require("./install/questions")).then(require("./install"));
+    if (args[0]) {
+      return require("./install")({name: args[0]});
+    }
+    return prompt(require("./install/questions")).then(require("./install"));
   }
 });

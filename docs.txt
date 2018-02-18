@@ -5,9 +5,11 @@ Usage:
  - slipy new
  - slipy watch
  - slipy run
+ - slipy install
 
 Commands:
  - slipy build [mode]: build app in [mode]
- - slipy new [template]: create new app from [template]
+ - slipy new: create new project, you will be prompted for info
  - slipy watch [port]: create server on [port] and watch files
  - slipy run [port]: create server on [port]
+ - slipy install [plugin]: install [plugin]
