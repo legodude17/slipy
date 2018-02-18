@@ -1,14 +1,14 @@
 module.exports = {
-  defaults(obj, keys) {
+  defaults(obj, keys, value = {}) {
     var o = obj;
     for (v of keys) {
-      o = this.default(o, v);
+      o = this.default(o, v, value);
     }
     return o;
   },
-  default(obj, key) {
+  default(obj, key, value = {}) {
     if (obj[key] == null) {
-      return obj[key] = {};
+      return obj[key] = value;
     }
     return obj[key];
   },

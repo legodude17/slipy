@@ -37,6 +37,6 @@ Object.assign(exports, {
     // TODO: Build to a dir, recompile on change
   },
   install(args, options) {
-    // TODO: Install plugin and init in package.json
+    prompt(require("./install/questions")).then(require("./install"));
   }
 });
