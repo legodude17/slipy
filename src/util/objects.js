@@ -1,9 +1,10 @@
-module.exports = {
+const objects = module.exports = {
   defaults(obj, keys, value = {}) {
     var o = obj;
-    for (v of keys) {
-      o = this.default(o, v, value);
+    for (v of keys.slice(0, -1)) {
+      o = objects.default(o, v, {});
     }
+    objects.default(o, keys[keys.length - 1], value);
     return o;
   },
   default(obj, key, value = {}) {
