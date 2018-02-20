@@ -21,11 +21,12 @@ function getPackageJSONPath(packageName) {
 function editPackageJSON(json, packageName) {
   return function edit(obj) {
     object.default(obj, 'slipy');
+    object.default(obj.slipy, 'plugins');
     const key = json.slipy_plugin.extensions + '-' + json.slipy_plugin.type;
-    if (obj.slipy[key]) {
-      obj.slipy[key] = Array.isArray(obj.slipy[key]) ? obj.slipy[key].concat(packageName) : [obj.slipy[key], packageName];
+    if (obj.slipy.plugins[key]) {
+      obj.slipy.plugins[key] = Array.isArray(obj.slipy.plugins[key]) ? obj.slipy.plugins[key].concat(packageName) : [obj.slipy.plugins[key], packageName];
     } else {
-      obj.slipy[key] = packageName;
+      obj.slipy.plugins[key] = packageName;
     }
     return obj;
   };
