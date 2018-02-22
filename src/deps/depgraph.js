@@ -1,4 +1,5 @@
 const file = require('./file');
+
 const depgraph = module.exports = {
   plugins: {},
   createGraph(entrypath, plugins = depgraph.plugins) {
@@ -15,23 +16,22 @@ const depgraph = module.exports = {
   },
   resolveAll(graph) {
     if (Object.keys(graph.files).filter(i => !!graph.files[i]).length) {
-      return Promise.all(deppgraph.getTasks(graph));
-    } else {
-      return Promise.resolve(true);
+      return Promise.all(depgraph.getTasks(graph));
     }
+    return Promise.resolve(true);
   },
   addDep(graph, path) {
-    graph.files[path] = null;
-  }
+    graph.files[path] = null; // eslint-disable-line no-param-reassign
+  },
   cache(graph, file) {
-    graph.files[file.file.path] = file;
+    graph.files[file.file.path] = file; // eslint-disable-line no-param-reassign
   },
   getTasks(graph) {
     return Object.keys(graph.files)
-      .map(i => file.resolve(file.createFromPath(i)).then(f => deppgraph.cache(graph, f)));
+      .map(i => file.resolve(file.createFromPath(i)).then(f => depgraph.cache(graph, f)));
   },
   resolve(graph) {
-    const maybeResolve = arg => arg === true && deppgraph.resolveAll(graph).then(maybeResolve));
+    const maybeResolve = arg => arg === true && depgraph.resolveAll(graph).then(maybeResolve);
     return depgraph.resolve(graph).then(maybeResolve);
   }
 };

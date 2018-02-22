@@ -1,13 +1,16 @@
 const o = require('../util/objects');
+
 const actions = ['preprocess', 'compile', 'postprocess'];
+
 const process = module.exports = {
   init(workerManager) {
     process.workerManager = workerManager;
   },
   getFileTasks(file, plugins) {
+    const plugs = {};
     actions.forEach(a => {
       o.default(plugins, a, []);
-      plugins[a] = Array.isArray(plugins[a]) ? plugins[a] : [plugins[a]];
+      plugs[a] = Array.isArray(plugins[a]) ? plugins[a] : [plugins[a]];
     });
     return actions
       .map(a => plugins[a])
@@ -15,7 +18,7 @@ const process = module.exports = {
       .map(p => process.makeRunner(process.makeJob(file, p)));
   },
   makeJob(file, plugin) {
-    const job = {file, work:{type:plugin.type}};
+    const job = { file, work: { type: plugin.type } };
     switch (plugin.type) {
       case 'module':
         job.work.moduleName = plugin.moduleName;
@@ -28,5 +31,5 @@ const process = module.exports = {
     }
     return job;
   },
-  makeRunner: job => () => process.workerManager.run(job)
+  makeRunner: job => () => process.workerManager.run(job),
 };

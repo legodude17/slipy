@@ -12,7 +12,7 @@ module.exports = [
     name: 'place',
     message: hash => `Which ${hash.type} do you want to use?`,
     default: '.',
-    when: hash => hash.type !== "blank" && hash.type !== "basic"
+    when: hash => hash.type !== 'blank' && hash.type !== 'basic'
   },
   {
     type: 'input',

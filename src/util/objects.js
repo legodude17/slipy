@@ -1,7 +1,7 @@
 const objects = module.exports = {
   defaults(obj, keys, value = {}) {
-    var o = obj;
-    for (v of keys.slice(0, -1)) {
+    let o = obj;
+    for (const v of keys.slice(0, -1)) {
       o = objects.default(o, v, {});
     }
     objects.default(o, keys[keys.length - 1], value);
@@ -11,15 +11,16 @@ const objects = module.exports = {
     return objects.map(obj, (i, v) => fn(v, srcObj[i], i));
   },
   mergeDeep(obj, srcObj, fn = (v1, v2) => v1 || v2) {
-    return objects.map(obj, function (idx, value) {
+    return objects.map(obj, (idx, value) => {
       const maybeRes = fn(value, srcObj[idx], idx);
-      if (typeof maybeRes !== "object") return maybeRes;
-      return mergeDeep(maybeRes, srcObj[idx], fn);
+      if (typeof maybeRes !== 'object') return maybeRes;
+      return objects.mergeDeep(maybeRes, srcObj[idx], fn);
     });
   },
   default(obj, key, value = {}) {
     if (obj[key] == null) {
-      return obj[key] = value;
+      obj[key] = value; // eslint-disable-line no-param-reassign
+      return obj[key];
     }
     return obj[key];
   },
@@ -27,26 +28,27 @@ const objects = module.exports = {
     Object.keys(obj).forEach(v => fn(v, obj[v], obj));
   },
   setArr(obj, arr, value) {
-    var o = obj;
-    arr.slice(0, -1).forEach(v => o = o[v]);
+    let o = obj;
+    arr.slice(0, -1).forEach(v => { o = o[v]; }); // eslint-disable-line no-param-reassign
     o[arr[arr.length - 1]] = value;
   },
-  getArr(obj, arr, value) {
-    var o = obj;
-    arr.forEach(v => o = o[v]);
+  getArr(obj, arr) {
+    let o = obj;
+    arr.forEach(v => { o = o[v]; });
     return o;
   },
   map(obj, fn) {
-    Object.keys(obj).forEach(v => obj[v] = fn(v, obj[v], obj));
+    Object.keys(obj).forEach(v => { obj[v] = fn(v, obj[v], obj); }); // eslint-disable-line no-param-reassign
   },
   hasOnly(obj, keys) {
-    return Object.keys(obj).filter(k => !keys.includes(k)).length === 0 && keys.filter(k => Object.keys(obj).includes(k)).length === 0;
+    return Object.keys(obj).filter(k => !keys.includes(k)).length === 0 &&
+      keys.filter(k => Object.keys(obj).includes(k)).length === 0;
   },
   dedupe(arr) {
-    if (!Array.isArray(arr)) throw new Error("Not an array");
+    if (!Array.isArray(arr)) throw new Error('Not an array');
     // TODO: Add dedupeObj
     const res = [];
-    arr.forEach(v => res.includes(v)&&res.push(v));
+    arr.forEach(v => res.includes(v) && res.push(v));
     return res;
   }
-}
+};

@@ -1,29 +1,30 @@
-const fs = require("fs");
-const prompt = require("inquirer").prompt;
+const fs = require('fs');
+const { prompt } = require('inquirer');
 const path = require('path');
-
+/* eslint-disable no-console */
+/* eslint-disable global-require */
+/* eslint-disable no-unused-vars */
 function done() {
-  console.log("Check! Yay!");
+  console.log('Check! Yay!');
 }
 
 function err(err) {
-  console.error("ERROR:", err);
+  console.error('ERROR:', err);
 }
 
-exports.help = () => console.log(fs.readFileSync(path.join(__dirname, "../docs.txt"), "utf-8"));
+exports.help = () => console.log(fs.readFileSync(path.join(__dirname, '../docs.txt'), 'utf-8'));
 
-exports.cli = function (argv) {
+exports.cli = function cli(argv) {
   const command = argv._.shift();
   if (exports[command]) {
     return exports[command](argv._, argv).then(done, err);
-  } else {
-    return exports.help();
   }
+  return exports.help();
 };
 
 Object.assign(exports, {
-  ['new'](args, options) {
-    return prompt(require("./new/questions")).then(require("./new"));
+  new(args, options) {
+    return prompt(require('./new/questions')).then(require('./new'));
   },
   run(args, options) {
     // TODO: Start server that live-compiles
@@ -36,8 +37,8 @@ Object.assign(exports, {
   },
   install(args, options) {
     if (args[0]) {
-      return require("./install")({name: args[0]});
+      return require('./install')({ name: args[0] });
     }
-    return prompt(require("./install/questions")).then(require("./install"));
+    return prompt(require('./install/questions')).then(require('./install'));
   }
 });

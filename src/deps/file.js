@@ -7,12 +7,14 @@ const file = module.exports = {
   init(plugins) {
     file.plugins = plugins;
     getDeps.setPlugins(plugins);
-  }
+  },
   create(deps = [], ...fileArgs) {
-    if (typeof deps === 'object' && !Array.isArray(deps)) return {
-      file: basicFile.create(deps),
-      deps: []
-    };
+    if (typeof deps === 'object' && !Array.isArray(deps)) {
+      return {
+        file: basicFile.create(deps),
+        deps: []
+      };
+    }
     return {
       file: basicFile.create(...fileArgs),
       deps
@@ -26,15 +28,14 @@ const file = module.exports = {
   },
   createFromPath(path) {
     return {
-      file: basicFile.create({path}),
+      file: basicFile.create({ path }),
       deps: []
     };
   },
   resolve(file) {
     return Promise.all([getDeps(file.file.path), fs.readFile(file.file.path)])
       .then(res => {
-        file.file.contents = res[1];
-        file.deps = res[0];
+        [file.deps, file.file.contents] = res; // eslint-disable-line no-param-reassign
         return file;
       });
   }

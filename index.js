@@ -1,11 +1,12 @@
 #! /usr/bin/env node
 
 const argv = require('minimist')(process.argv.slice(2));
-const command = argv._[0];
-const slipy = require(".");
-const alias = require("./src/alias");
+const slipy = require('.');
+const alias = require('./src/alias'); // eslint-disable-line no-unused-vars
 
-if (command === "help" || argv.h || argv.help) {
+const command = argv._[0];
+
+if (command === 'help' || argv.h || argv.help) {
   slipy.help();
 } else {
   slipy.cli(argv);

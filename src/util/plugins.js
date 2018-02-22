@@ -1,3 +1,6 @@
+const o = require('./objects');
+const mm = require('micromatch');
+
 const plugins = module.exports = {
   getPluginsForExtension(extension, ps) {
     return plugins.mergePlugins(ps, Object.keys(ps).filter(pk => mm.isMatch(extension, pk)));
@@ -12,4 +15,4 @@ const plugins = module.exports = {
     });
     return plugs;
   }
-}
+};

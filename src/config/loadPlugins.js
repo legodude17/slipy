@@ -4,34 +4,34 @@ const file = require('../building/file');
 const object = require('../util/objects');
 const r = require('../util/require');
 
-module.exports = function (plugins) {
-  object.forEach(plugins, (i, v) => {
-    object.forEach(v, (j, p) => {
-      plugins[i][j] = loadPlugin(p);
-    });
-  });
-  return plugins;
-}
-
 function loadPlugin(p) {
   if (Array.isArray(p)) return p.map(loadPlugin);
-  var func;
+  let func;
   try {
     func = r(p);
     func.type = 'module';
     func.moduleName = p;
   } catch (e) {
     try {
-      var script = new vm.Script(p);
-      func = file => {
-        var context = vm.createContext({file, require: v => require(v)});
+      const script = new vm.Script(p);
+      func = f => {
+        const context = vm.createContext({ file: f, require: v => require(v) }); //eslint-disable-line
         return file.create(script.runInContext(context));
       };
       func.type = 'script';
       func.code = p;
     } catch (e) {
-      throw new Error("I don't understand: " + util.inspect(p));
+      throw new Error(`I don't understand: ${util.inspect(p)}`);
     }
   }
   return func;
 }
+
+module.exports = function loadPlugins(plugins) {
+  object.forEach(plugins, (i, v) => {
+    object.forEach(v, (j, p) => {
+      plugins[i][j] = loadPlugin(p); // eslint-disable-line no-param-reassign
+    });
+  });
+  return plugins;
+};

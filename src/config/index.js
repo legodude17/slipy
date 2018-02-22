@@ -3,7 +3,16 @@ const object = require('../util/objects');
 const loadPlugins = require('./loadPlugins');
 const configDefaults = require('./defaults');
 
-const config = module.exports = {
+function readPlugins(slipyPlug) {
+  const plugins = {};
+  object.forEach(slipyPlug, (i, v) => {
+    object.defaults(plugins, i.split('-'));
+    object.setArr(plugins, i.split('-'), v);
+  });
+  return plugins;
+}
+
+module.exports = {
   getPlugins(slipy) {
     return loadPlugins(readPlugins(slipy.plugins));
   },
@@ -13,12 +22,3 @@ const config = module.exports = {
       .then(obj => object.mergeDeep(obj, configDefaults));
   }
 };
-
-function readPlugins(slipy_plug) {
-  const plugins = {};
-  object.forEach(slipy, (i, v) => {
-    object.defaults(plugins, i.split('-'));
-    object.setArr(plugins, i.split('-'), v);
-  });
-  return plugins;
-}

@@ -7,7 +7,9 @@
     "slipy": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "quake-task deploy",
+    "lint": "eslint **/*.js"
   },
   "repository": {
     "type": "git",
@@ -27,10 +29,21 @@
     "execa": "^0.9.0",
     "globby": "^8.0.0",
     "inquirer": "^5.1.0",
+    "make-dir": "^1.2.0",
     "micromatch": "^3.1.5",
     "minimist": "^1.2.0",
     "pify": "^3.0.0",
     "yargs": "^11.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "quake-git": "^1.0.0",
+    "quake-run": "^1.1.0",
+    "quake-task": "^2.5.0"
+  }
 }
