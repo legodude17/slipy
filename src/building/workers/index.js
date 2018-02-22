@@ -18,7 +18,7 @@ const workers = module.exports = {
     };
   },
   initManager(man, iw) {
-    man.workers = man.workers.map((_, i) => workers.createWorker(man, i)); // eslint-disable-line no-param-reassign
+    man.workers = man.workers.map((_, i) => workers.createWorker(man, i));
     if (iw) {
       man.workers.forEach(workers.initWorker);
     }
@@ -34,25 +34,25 @@ const workers = module.exports = {
     };
   },
   initWorker(worker) {
-    worker.workerObj = cluster.fork(); // eslint-disable-line no-param-reassign
+    worker.workerObj = cluster.fork();
     worker.workerObj.on('message', workers.processMessage(worker));
   },
   processMessage(worker) {
     return function messageProcess(messageStr) {
       if (messageStr === 'ready') {
-        worker.ready = true; // eslint-disable-line no-param-reassign
+        worker.ready = true;
         worker.events.emit('onReady');
         if (worker.manager.workers.every(w => w.ready)) {
-          worker.manager.ready = true; // eslint-disable-line no-param-reassign
+          worker.manager.ready = true;
           worker.manager.events.emit('ready');
         }
         return;
       }
       const message = JSON.parse(messageStr);
       const job = jobs[message.type].deserialize(message.job);
-      worker.currentJob = null; // eslint-disable-line no-param-reassign
+      worker.currentJob = null;
       if (message.error) {
-        const { error } = message; // eslint-disable-line no-param-reassign
+        const { error } = message;
         worker.manager.erroredJobs.push(job);
         worker.manager.events.emit('error', error, job);
       } else {
@@ -66,7 +66,7 @@ const workers = module.exports = {
   },
   addJob(man, job) {
     if (!job.id) {
-      job.id = Date.now().toString() + Math.random(); // eslint-disable-line no-param-reassign
+      job.id = Date.now().toString() + Math.random();
     }
     man.jobQueue.push(job);
     workers.distributeJobs(man);
@@ -80,12 +80,12 @@ const workers = module.exports = {
     workers.startJob(man.workers.filter(w => !w.currentJob)[0], man.jobQueue.shift());
   },
   startJob(worker, job) {
-    worker.currentJob = job; // eslint-disable-line no-param-reassign
+    worker.currentJob = job;
     worker.workerObj.send(JSON.stringify({ job: jobs[job.type].serialize(job), type: job.type }));
   },
   run(man, job) {
     if (!job.id) {
-      job.id = Date.now().toString() + Math.random(); // eslint-disable-line no-param-reassign
+      job.id = Date.now().toString() + Math.random();
     }
     return new Promise(((resolve, reject) => {
       function onJobDone(result, maybeJob) {

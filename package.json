@@ -43,7 +43,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "quake-git": "^1.0.0",
-    "quake-run": "^1.1.0",
+    "quake-run": "^1.2.0",
     "quake-task": "^2.5.0"
   }
 }

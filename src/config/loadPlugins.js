@@ -30,7 +30,7 @@ function loadPlugin(p) {
 module.exports = function loadPlugins(plugins) {
   object.forEach(plugins, (i, v) => {
     object.forEach(v, (j, p) => {
-      plugins[i][j] = loadPlugin(p); // eslint-disable-line no-param-reassign
+      plugins[i][j] = loadPlugin(p);
     });
   });
   return plugins;

@@ -21,10 +21,10 @@ const depgraph = module.exports = {
     return Promise.resolve(true);
   },
   addDep(graph, path) {
-    graph.files[path] = null; // eslint-disable-line no-param-reassign
+    graph.files[path] = null;
   },
   cache(graph, file) {
-    graph.files[file.file.path] = file; // eslint-disable-line no-param-reassign
+    graph.files[file.file.path] = file;
   },
   getTasks(graph) {
     return Object.keys(graph.files)

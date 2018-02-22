@@ -18,7 +18,7 @@ const file = module.exports = {
   },
   load(file) {
     return fs.readFile(file.path)
-      .then(v => (file.contents = v));
+      .then(v => { file.contents = v; });
   },
   write(file) {
     return fs.writeFile(file.path, file.contents)
@@ -28,5 +28,5 @@ const file = module.exports = {
   },
   is(file) {
     return o.hasOnly(file, ['contents', 'path', 'map']);
-  },
+  }
 };

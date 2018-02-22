@@ -6,14 +6,14 @@ exports.runPlugin = {
   serialize(job) {
     const serialJob = { file: JSON.stringify(job.file), id: job.id };
     switch (job.work.type) {
-      case 'module':
-        serialJob.module = job.work.moduleName;
-        break;
-      case 'script':
-        serialJob.script = job.work.code;
-        break;
-      default:
-        throw new Error(job.work.type);
+    case 'module':
+      serialJob.module = job.work.moduleName;
+      break;
+    case 'script':
+      serialJob.script = job.work.code;
+      break;
+    default:
+      throw new Error(job.work.type);
     }
     return serialJob;
   },
@@ -33,7 +33,6 @@ exports.runPlugin = {
     return job;
   },
   cache(cache, job) {
-    /* eslint-disable no-param-reassign */
     if (job.work[0] === 'require') {
       if (cache[job.work[1]]) {
         job.work[1] = cache[job.work[1]];
@@ -48,5 +47,5 @@ exports.runPlugin = {
   },
   work(job) {
     return Promise.resolve(job.work[1](job.file)).then(mf => (file.is(mf) ? mf : file.create(mf)));
-  },
+  }
 };

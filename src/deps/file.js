@@ -35,7 +35,7 @@ const file = module.exports = {
   resolve(file) {
     return Promise.all([getDeps(file.file.path), fs.readFile(file.file.path)])
       .then(res => {
-        [file.deps, file.file.contents] = res; // eslint-disable-line no-param-reassign
+        [file.deps, file.file.contents] = res;
         return file;
       });
   }

@@ -20,16 +20,16 @@ const process = module.exports = {
   makeJob(file, plugin) {
     const job = { file, work: { type: plugin.type } };
     switch (plugin.type) {
-      case 'module':
-        job.work.moduleName = plugin.moduleName;
-        break;
-      case 'script':
-        job.work.script = plugin.code;
-        break;
-      default:
-        throw new Error(plugin.type);
+    case 'module':
+      job.work.moduleName = plugin.moduleName;
+      break;
+    case 'script':
+      job.work.script = plugin.code;
+      break;
+    default:
+      throw new Error(plugin.type);
     }
     return job;
   },
-  makeRunner: job => () => process.workerManager.run(job),
+  makeRunner: job => () => process.workerManager.run(job)
 };

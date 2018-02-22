@@ -15,6 +15,8 @@ const building = module.exports = {
     return promise.serial(cess.getFileTasks(p.getPluginsForExtension(path.extname(file.path))));
   },
   combineFiles(ext, files) {
-    return p.getPluginsForExtension(ext).combine(files);
-  },
+    const plugs = p.getPluginsForExtension(ext);
+    if (typeof plugs.combine !== 'function') return Promise.reject(new Error('Can only use 1 combiner per extension'));
+    return plugs.combine(files);
+  }
 };

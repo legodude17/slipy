@@ -19,7 +19,7 @@ const objects = module.exports = {
   },
   default(obj, key, value = {}) {
     if (obj[key] == null) {
-      obj[key] = value; // eslint-disable-line no-param-reassign
+      obj[key] = value;
       return obj[key];
     }
     return obj[key];
@@ -29,7 +29,7 @@ const objects = module.exports = {
   },
   setArr(obj, arr, value) {
     let o = obj;
-    arr.slice(0, -1).forEach(v => { o = o[v]; }); // eslint-disable-line no-param-reassign
+    arr.slice(0, -1).forEach(v => { o = o[v]; });
     o[arr[arr.length - 1]] = value;
   },
   getArr(obj, arr) {
@@ -38,7 +38,7 @@ const objects = module.exports = {
     return o;
   },
   map(obj, fn) {
-    Object.keys(obj).forEach(v => { obj[v] = fn(v, obj[v], obj); }); // eslint-disable-line no-param-reassign
+    Object.keys(obj).forEach(v => { obj[v] = fn(v, obj[v], obj); });
   },
   hasOnly(obj, keys) {
     return Object.keys(obj).filter(k => !keys.includes(k)).length === 0 &&
