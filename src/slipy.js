@@ -1,5 +1,6 @@
 const fs = require("fs");
 const prompt = require("inquirer").prompt;
+const path = require('path');
 
 function done() {
   console.log("Check! Yay!");
@@ -9,7 +10,7 @@ function err(err) {
   console.error("ERROR:", err);
 }
 
-exports.help = () => console.log(fs.readFileSync("docs.txt", "utf-8"));
+exports.help = () => console.log(fs.readFileSync(path.join(__dirname, "../docs.txt"), "utf-8"));
 
 exports.cli = function (argv) {
   const command = argv._.shift();

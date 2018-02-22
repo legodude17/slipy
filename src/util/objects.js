@@ -7,6 +7,16 @@ const objects = module.exports = {
     objects.default(o, keys[keys.length - 1], value);
     return o;
   },
+  merge(obj, srcObj, fn = (v1, v2) => v1 || v2) {
+    return objects.map(obj, (i, v) => fn(v, srcObj[i], i));
+  },
+  mergeDeep(obj, srcObj, fn = (v1, v2) => v1 || v2) {
+    return objects.map(obj, function (idx, value) {
+      const maybeRes = fn(value, srcObj[idx], idx);
+      if (typeof maybeRes !== "object") return maybeRes;
+      return mergeDeep(maybeRes, srcObj[idx], fn);
+    });
+  },
   default(obj, key, value = {}) {
     if (obj[key] == null) {
       return obj[key] = value;
@@ -25,5 +35,18 @@ const objects = module.exports = {
     var o = obj;
     arr.forEach(v => o = o[v]);
     return o;
+  },
+  map(obj, fn) {
+    Object.keys(obj).forEach(v => obj[v] = fn(v, obj[v], obj));
+  },
+  hasOnly(obj, keys) {
+    return Object.keys(obj).filter(k => !keys.includes(k)).length === 0 && keys.filter(k => Object.keys(obj).includes(k)).length === 0;
+  },
+  dedupe(arr) {
+    if (!Array.isArray(arr)) throw new Error("Not an array");
+    // TODO: Add dedupeObj
+    const res = [];
+    arr.forEach(v => res.includes(v)&&res.push(v));
+    return res;
   }
 }

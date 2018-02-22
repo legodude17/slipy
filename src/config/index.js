@@ -1,6 +1,7 @@
 const fs = require('pify')(require('fs'));
 const object = require('../util/objects');
 const loadPlugins = require('./loadPlugins');
+const configDefaults = require('./defaults');
 
 const config = module.exports = {
   getPlugins(slipy) {
@@ -8,7 +9,8 @@ const config = module.exports = {
   },
   loadConfig() {
     return fs.readFile('package.json')
-      .then(buf => JSON.parse(buf.toString()).slipy);
+      .then(buf => JSON.parse(buf.toString()).slipy)
+      .then(obj => object.mergeDeep(obj, configDefaults));
   }
 };
 

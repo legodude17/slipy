@@ -28,7 +28,5 @@ const process = module.exports = {
     }
     return job;
   },
-  makeRunner(job) {
-    return () => process.workerManager.run(job);
-  }
+  makeRunner: job => () => process.workerManager.run(job)
 };

@@ -1,4 +1,7 @@
 const path = require('path');
+const r = require('../../util/require');
+const file = require('../file');
+
 exports.runPlugin = {
   serialize(job) {
     const serialJob = {file: JSON.stringify(job.file), id: job.id};
@@ -17,9 +20,9 @@ exports.runPlugin = {
     if (serialJob.module) {
       job.work = ['require', job.module];
     } else if (serialJob.script) {
-      job.work = [serialJob.script, (script, file) => file => {
+      job.work = [serialJob.script, script => file => {
         var context = vm.createContext({file, require: v => require(v)});
-        return file.create(script.runInContext(context));
+        return script.runInContext(context);
       }];
     } else {
       throw new Error("WHAT!?");
@@ -31,17 +34,17 @@ exports.runPlugin = {
       if (cache[job.work[1]]) {
         job.work[1] = cache[job.work[1]];
       } else {
-        cache[job.work[1]] = job.work[1] = require(job.work[1]);
+        cache[job.work[1]] = job.work[1] = r(job.work[1]);
       }
     } else {
       if (cache[job.work[0]]) {
         job.work[1] = cache[job.work[0]];
       } else {
-        cache[job.work[0]] = job.work[1] = job.work[1](new vm.Script(job.work[0]), require(path.join(__dirname, '../file')));
+        cache[job.work[0]] = job.work[1] = job.work[1](new vm.Script(job.work[0])));
       }
     }
   },
   work(job) {
-    return job.work[1](job.file);
+    return Promise.resolve(job.work[1](job.file)).then(mf => file.is(mf) ? mf : file.create(mf));
   }
 }

@@ -2,6 +2,7 @@ const vm = require('vm');
 const util = require('util');
 const file = require('../building/file');
 const object = require('../util/objects');
+const r = require('../util/require');
 
 module.exports = function (plugins) {
   object.forEach(plugins, (i, v) => {
@@ -16,7 +17,7 @@ function loadPlugin(p) {
   if (Array.isArray(p)) return p.map(loadPlugin);
   var func;
   try {
-    func = require(p);
+    func = r(p);
     func.type = 'module';
     func.moduleName = p;
   } catch (e) {

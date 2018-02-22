@@ -8,7 +8,7 @@ const workers = module.exports = {
     cluster.setupMaster({exec: path.join(__dirname, 'worker.js')});
     return {
       workerNum: opts.workerNum,
-      workers: Array.from({length:opts.workerNum}).fill(null).
+      workers: Array.from({length:opts.workerNum}).fill(null),
       jobQueue: [],
       currentJobs: [],
       doneJobs: [],
@@ -41,11 +41,10 @@ const workers = module.exports = {
     return function (message) {
       w.events.on('ready', cb);
       w.events.on('jobDone', () => workers.distributeJobs(man));
-
       if (message === 'ready') {
         worker.ready = true;
         worker.events.emit('onReady');
-        if (worker.manager.workers.every(w => w.ready) {
+        if (worker.manager.workers.every(w => w.ready)) {
           worker.manager.ready = true;
           worker.manager.events.emit('ready');
         }
