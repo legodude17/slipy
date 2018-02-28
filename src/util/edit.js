@@ -1,4 +1,4 @@
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 
 module.exports = function edit(path, fn) {
   return fs.readFile(path)

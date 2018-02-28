@@ -1,6 +1,5 @@
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const o = require('../util/objects.js');
-const mdir = require('make-dir');
 const path = require('path');
 
 const file = module.exports = {
@@ -23,7 +22,7 @@ const file = module.exports = {
   write(file) {
     return fs.writeFile(file.path, file.contents)
       .catch(() =>
-        mdir(path.dirname(file.path))
+        fs.mkdirp(path.dirname(file.path))
           .then(() => fs.writeFile(file.path, file.contents)));
   },
   is(file) {

@@ -1,4 +1,4 @@
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const object = require('../util/objects');
 const loadPlugins = require('./loadPlugins');
 const configDefaults = require('./defaults');

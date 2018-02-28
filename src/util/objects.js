@@ -7,15 +7,20 @@ const objects = module.exports = {
     objects.default(o, keys[keys.length - 1], value);
     return o;
   },
-  merge(obj, srcObj, fn = (v1, v2) => v1 || v2) {
+  merge(obj, srcObj, fn = objects.defualtMerge) {
     return objects.map(obj, (i, v) => fn(v, srcObj[i], i));
   },
-  mergeDeep(obj, srcObj, fn = (v1, v2) => v1 || v2) {
+  mergeDeep(obj, srcObj, fn = objects.defualtMerge) {
     return objects.map(obj, (idx, value) => {
       const maybeRes = fn(value, srcObj[idx], idx);
       if (typeof maybeRes !== 'object') return maybeRes;
+      if (Array.isArray(maybeRes) && fn([1], [2]).length !== 1) return maybeRes;
       return objects.mergeDeep(maybeRes, srcObj[idx], fn);
     });
+  },
+  defaultMerge(v1, v2) {
+    if (Array.isArray(v1)) return v1.concat(v2);
+    return v1 || v2;
   },
   default(obj, key, value = {}) {
     if (obj[key] == null) {
@@ -48,7 +53,7 @@ const objects = module.exports = {
     if (!Array.isArray(arr)) throw new Error('Not an array');
     // TODO: Add dedupeObj
     const res = [];
-    arr.forEach(v => res.includes(v) && res.push(v));
+    arr.forEach(v => res.includes(v) || res.push(v));
     return res;
   }
 };

@@ -1,4 +1,4 @@
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const util = require('util');
 
 function done(opts) {

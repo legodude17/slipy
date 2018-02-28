@@ -1,18 +1,41 @@
 const path = require('path');
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const o = require('../util/objects');
-const p = require('../util/plugins');
+const plugs = require('../plugins/plugins');
+const download = require('../util/download');
 
-let plugins;
+function getAssigns(deps) {
+  const assigns = { [Symbol.for('globals')]: [] };
+  deps.forEach(dep => {
+    if (dep.names) {
+      o.forEach(dep.names, (v, i) => {
+        assigns[i] = `${dep.place}/${v}`;
+      });
+    } else {
+      assigns[Symbol.for('globals')].push(dep.place);
+    }
+  });
+  return assigns;
+}
+
+function getInstaller(deps) {
+  const urls = deps.filter(dep => dep.url).map(dep => dep.place);
+  return function install(opts) {
+    if (opts.down) {
+      return Promise.all(urls.map(download.to(opts.assetsDir)));
+    }
+    return Promise.resolve(false);
+  };
+}
+
 module.exports = function getDeps(file) {
-  const ext = path.extname(file);
-  const plugs = p.getPluginsForExtension(ext, plugins);
-  return fs.readFile(file)
-    .then(contents => Promise.all(plugs.map(p => Promise.resolve(p(contents)))))
-    .then(arr => arr.reduce((arr, a) => arr.concat(a), []))
-    .then(o.dedupe);
-};
-
-module.exports.init = function init(p) {
-  plugins = p;
+  const plug = plugs.extensions[path.extname(file).slice(1)];
+  if (!plug) throw new Error(`Unrecognized file ${file}, ${path.extname(file).slice(1)}`);
+  return fs.readFile(file, 'utf-8')
+    .then(contents => plug.getDeps(contents))
+    .then(deps => ({
+      deps: deps.map(dep => dep.place),
+      assigns: getAssigns(deps),
+      install: getInstaller(deps)
+    }));
 };

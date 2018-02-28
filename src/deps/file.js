@@ -1,12 +1,12 @@
 const basicFile = require('../building/file');
 const getDeps = require('./getdeps.js');
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 
 const file = module.exports = {
   plugins: {},
   init(plugins) {
     file.plugins = plugins;
-    getDeps.setPlugins(plugins);
+    // getDeps.setPlugins(plugins);
   },
   create(deps = [], ...fileArgs) {
     if (typeof deps === 'object' && !Array.isArray(deps)) {
@@ -35,7 +35,7 @@ const file = module.exports = {
   resolve(file) {
     return Promise.all([getDeps(file.file.path), fs.readFile(file.file.path)])
       .then(res => {
-        [file.deps, file.file.contents] = res;
+        [{ deps: file.deps, assigns: file.assignMap, install: file.process }, file.file.contents] = res;
         return file;
       });
   }

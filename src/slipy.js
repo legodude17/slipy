@@ -40,5 +40,8 @@ Object.assign(exports, {
       return require('./install')({ name: args[0] });
     }
     return prompt(require('./install/questions')).then(require('./install'));
+  },
+  configure(args, options) {
+    return require('./configure')(args[0]);
   }
 });

@@ -5,3 +5,5 @@ module.exports = function getDepGraph(entrypath, plugins) {
   return depgraph.resolve(graph)
     .then(() => graph);
 };
+
+module.exports.dg = depgraph;

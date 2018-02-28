@@ -1,5 +1,5 @@
 const http = require('http');
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const URL = require('url');
 
 const get = module.exports = function get(place) {

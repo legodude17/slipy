@@ -2,8 +2,7 @@ const execa = require('execa');
 const inquirer = require('inquirer');
 const os = require('os');
 const path = require('path');
-const fs = require('pify')(require('fs'));
-const del = require('del');
+const fs = require('../util/fs');
 
 let packageName;
 let dirName;
@@ -31,7 +30,7 @@ function installWOnpx() {
     .then(() => fs.mkdir(dirName))
     .then(() => process.chdir(dirName))
     .then(() => execa(getExecPath(dir)))
-    .then(() => del(dir, { force: true }));
+    .then(() => fs.rmrf(dir, { force: true }));
 }
 
 function askForNpx() {

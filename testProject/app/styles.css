@@ -1,0 +1,6 @@
+@import a.css;
+@import url('b.css');
+
+.a {
+  background: url('./back.png');
+}

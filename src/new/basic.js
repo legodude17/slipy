@@ -1,4 +1,4 @@
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const path = require('path');
 const execa = require('execa');
 

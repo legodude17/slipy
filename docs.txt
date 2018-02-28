@@ -1,11 +1,7 @@
 Slipy
 
 Usage:
- - slipy build
- - slipy new
- - slipy watch
- - slipy run
- - slipy install
+ - slipy <command> [...args]
 
 Commands:
  - slipy build [mode]: build app in [mode]
@@ -13,3 +9,4 @@ Commands:
  - slipy watch [port]: create server on [port] and watch files
  - slipy run [port]: create server on [port]
  - slipy install [plugin]: install [plugin]
+ - slipy configure: analyser your code and configure slipy for you

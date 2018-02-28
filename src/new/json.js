@@ -1,5 +1,5 @@
 const get = require('../util/get');
-const fs = require('pify')(require('fs'));
+const fs = require('../util/fs');
 const execa = require('execa');
 const { serial } = require('../util/promises');
 
