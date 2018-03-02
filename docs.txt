@@ -9,4 +9,4 @@ Commands:
  - slipy watch [port]: create server on [port] and watch files
  - slipy run [port]: create server on [port]
  - slipy install [plugin]: install [plugin]
- - slipy configure: analyser your code and configure slipy for you
+ - slipy configure: analyse your code and configure slipy for you

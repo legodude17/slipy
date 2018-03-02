@@ -43,7 +43,9 @@ const objects = module.exports = {
     return o;
   },
   map(obj, fn) {
-    Object.keys(obj).forEach(v => { obj[v] = fn(v, obj[v], obj); });
+    const o = {};
+    Object.keys(obj).forEach(v => { o[v] = fn(v, obj[v], obj); });
+    return o;
   },
   hasOnly(obj, keys) {
     return Object.keys(obj).filter(k => !keys.includes(k)).length === 0 &&

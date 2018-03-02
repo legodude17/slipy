@@ -169,7 +169,7 @@ plugins = module.exports = {
         return html.getPlugConfig()
           .then(res => ({
             type: 'script',
-            code: `require('posthtml')(require('posthtml-load-plugins')(${res})).process(file.contents).then(res => {contents: res.html, map: res.map})` // eslint-disable-line
+            code: `require('posthtml')(require('posthtml-load-plugins')(${res||"''"})).process(file.contents).then(res => {contents: res.html, map: res.map})` // eslint-disable-line
           }));
       }
     },

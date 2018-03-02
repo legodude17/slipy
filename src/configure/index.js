@@ -3,6 +3,7 @@ const { analyseFiles } = require('./analyse');
 const findEntry = require('./entry');
 const { dg: depgraph } = require('../deps');
 const { npm } = require('../install');
+const fs = require('../util/fs');
 
 /* eslint-disable no-console */
 
@@ -32,6 +33,11 @@ module.exports = function configure(dir) {
     .then(log('Files analysed'))
     .then(([ana, graph]) => depgraph.analyse(graph, ana))
     .then(getUserInput)
-    .then(log('Input:', true))
-    .then(input => Promise.all(Object.keys(input).filter(i => i.startsWith('install') && input[i]).map(p => { log(`Installing ${p}`)(); return npm(p.replace('install-', '')); })));
+    .then(([input, graph]) => {
+      if (input.save) return fs.w('.cache/depgraph.json', depgraph.serialize(graph)).then(() => input);
+      return input;
+    })
+    .then(input => Promise.all(Object.keys(input)
+      .filter(i => i.startsWith('install') && input[i])
+      .map(p => { console.log(`Installing ${p}`); return npm(p.replace('install-', '')); })));
 };

@@ -13,5 +13,5 @@ module.exports = function input(graph) {
       type: 'confirm',
       name: `install-${pkg}`,
       message: `Can I install the package ${pkg} that I have detected you need?`
-    }))));
+    })))).then(input => [input, graph]);
 };

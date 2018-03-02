@@ -7,5 +7,6 @@ module.exports = {
   targets: ['>1%, last 2 versions'],
   pluginConfig: {},
   defaultEnv: 'development',
-  serveUrl: '/'
+  serveUrl: '/',
+  jobs: 8
 };

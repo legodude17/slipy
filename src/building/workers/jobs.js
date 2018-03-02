@@ -18,10 +18,10 @@ exports.runPlugin = {
     return serialJob;
   },
   deserialize(serialJob) {
-    const job = { file: JSON.parse(serialJob.file), id: serialJob.id };
-    if (serialJob.module) {
+    const job = { file: serialJob.file, id: serialJob.id };
+    if (serialJob.module || serialJob.type === 'module') {
       job.work = ['require', job.module];
-    } else if (serialJob.script) {
+    } else if (serialJob.script || serialJob.type === 'script') {
       job.work = [serialJob.script, script => file => {
         // Need dynamic require to make this work
         const context = vm.createContext({ file, require: v => require(v) }); // eslint-disable-line

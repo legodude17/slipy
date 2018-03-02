@@ -48,10 +48,16 @@ const depgraph = module.exports = {
     return depgraph.startResolve(graph).then(() => depgraph.resolveAll(graph)).then(maybeResolve).then(() => graph);
   },
   serialize(graph) {
-    return JSON.stringify(graph);
+    return JSON.stringify({
+      entry: file.serialize(graph.entry),
+      files: o.map(graph.files, (i, v) => file.serialize(v))
+    });
   },
   deserialize(graphStr) {
-    return JSON.parse(graphStr);
+    return o.map(JSON.parse(graphStr), (i, v) => {
+      if (i === 'entry') return file.deserialize(v);
+      return o.map(v, (j, b) => file.deserialize(b));
+    });
   },
   update(graph, fileUpdate) {
     graph.files[fileUpdate.path] = null;
@@ -60,5 +66,17 @@ const depgraph = module.exports = {
   analyse(graph, analysation) {
     o.forEach(analysation, (i, v) => { graph.files[i].processed = v; });
     return graph;
+  },
+  getSubGraph(graph, f) {
+    const subGraph = depgraph.createGraph(f.path);
+    subGraph.entry = f;
+    f.deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
+    while (Object.keys(subGraph.files).filter(i => !subGraph.files[i]).length) {
+      Object.keys(subGraph.files).filter(i => !subGraph.files[i]).forEach(i => {
+        subGraph.files[i] = graph.files[i];
+        subGraph.files[i].deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
+      });
+    }
+    return subGraph;
   }
 };

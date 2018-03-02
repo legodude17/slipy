@@ -2,10 +2,10 @@ const basicFile = require('../building/file');
 const getDeps = require('./getdeps.js');
 const fs = require('../util/fs');
 
-const file = module.exports = {
+const files = module.exports = {
   plugins: {},
   init(plugins) {
-    file.plugins = plugins;
+    files.plugins = plugins;
     // getDeps.setPlugins(plugins);
   },
   create(deps = [], ...fileArgs) {
@@ -38,5 +38,17 @@ const file = module.exports = {
         [{ deps: file.deps, assigns: file.assignMap, install: file.process }, file.file.contents] = res;
         return file;
       });
+  },
+  serialize(file) {
+    return {
+      file: basicFile.create({ path: file.file.path }),
+      deps: file.deps
+    };
+  },
+  deserialize(file) {
+    return {
+      file: basicFile.create({ path: file.file.path }),
+      deps: file.deps
+    };
   }
 };

@@ -4,11 +4,11 @@ const jobs = require('./jobs');
 const EventEmitter = require('events');
 
 const workers = module.exports = {
-  createManager(opts) {
+  createManager(workerNum) {
     cluster.setupMaster({ exec: path.join(__dirname, 'worker.js') });
     return {
-      workerNum: opts.workerNum,
-      workers: Array.from({ length: opts.workerNum }).fill(null),
+      workerNum,
+      workers: Array.from({ length: workerNum }).fill(null),
       jobQueue: [],
       currentJobs: [],
       doneJobs: [],
