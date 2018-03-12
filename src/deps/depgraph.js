@@ -69,13 +69,15 @@ const depgraph = module.exports = {
   },
   getSubGraph(graph, f) {
     const subGraph = depgraph.createGraph(f.path);
+    let filesToAdd = Object.keys(subGraph.files).filter(i => !subGraph.files[i]);
     subGraph.entry = f;
     f.deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
-    while (Object.keys(subGraph.files).filter(i => !subGraph.files[i]).length) {
-      Object.keys(subGraph.files).filter(i => !subGraph.files[i]).forEach(i => {
+    while (filesToAdd.length) {
+      filesToAdd.forEach(i => {
         subGraph.files[i] = graph.files[i];
         subGraph.files[i].deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
       });
+      filesToAdd = Object.keys(subGraph.files).filter(i => !subGraph.files[i]);
     }
     return subGraph;
   }

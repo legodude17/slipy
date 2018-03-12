@@ -1,9 +1,12 @@
 const fs = require('fs');
 const { prompt } = require('inquirer');
 const path = require('path');
+const { load: loadConfig } = require('./config');
+const { getLike } = require('./util/strings');
 /* eslint-disable no-console */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-vars */
+/* eslint-disable import/no-dynamic-require */
 function done() {
   console.log('Check! Yay!');
 }
@@ -12,28 +15,22 @@ function err(err) {
   console.error('ERROR:', err);
 }
 
-exports.help = () => console.log(fs.readFileSync(path.join(__dirname, '../docs.txt'), 'utf-8'));
+function run(type, arg, options) {
+  return loadConfig().then(conf => require(`./${type}`)(arg, Object.assign(conf, { options })));
+}
 
-exports.cli = function cli(argv) {
-  const command = argv._.shift();
-  if (exports[command]) {
-    return exports[command](argv._, argv).then(done, err);
-  }
-  return exports.help();
-};
-
-Object.assign(exports, {
+const commands = Object.assign(Object.create(null), {
   new(args, options) {
     return prompt(require('./new/questions')).then(require('./new'));
   },
   run(args, options) {
-    // TODO: Start server that live-compiles
+    return run('run', args[0], options);
   },
   build(args, options) {
-    // TODO: Build to a dir, with optional server
+    return run('build', args[0], options);
   },
   watch(args, options) {
-    // TODO: Build to a dir, recompile on change
+    return run('build', args[0], options);
   },
   install(args, options) {
     if (args[0]) {
@@ -45,3 +42,18 @@ Object.assign(exports, {
     return require('./configure')(args[0]);
   }
 });
+
+exports.help = () => console.log(fs.readFileSync(path.join(__dirname, '../docs.txt'), 'utf-8'));
+
+exports.cli = function cli(argv) {
+  const command = argv._.shift();
+  if (commands[command]) {
+    return commands[command](argv._, argv).then(done, err);
+  }
+  console.error(`Unrecognized command ${command}. Did you mean:
+${getLike(command, Object.keys(commands)).join('\n')}`);
+  return Promise.reject(new Error('Unrecognized command'));
+  // return exports.help();
+};
+
+Object.assign(exports, commands);

@@ -1,10 +1,11 @@
-const detectVersion = require('ecmascript-version-detector');
 const o = require('../util/objects');
 const babel = require('./babel');
-const css = require('css');
 const valueParser = require('postcss-value-parser');
 const htmlparser = require('htmlparser2');
 const html = require('./html');
+const codeUtils = require('../util/code');
+
+const dutils = htmlparser.DomUtils;
 
 
 let config; // eslint-disable-line no-unused-vars
@@ -20,7 +21,7 @@ function is(extension) {
 
 const arr = () => [];
 
-plugins = module.exports = {
+plugins = {
   init(c) {
     config = c;
   },
@@ -30,14 +31,14 @@ plugins = module.exports = {
   extensions: {
     js: {
       getInstall(code) {
-        const parts = detectVersion.parse(code);
+        const parts = codeUtils.js.parse(code);
         if (!babel.isBabelNeeded(parts)) {
           return [];
         }
-        return ['babel-core'].concat(babel.getPlugins(parts));
+        return ['babel-core', 'uglify-es'].concat(babel.getPlugins(parts));
       },
       getDeps(code) {
-        const parts = detectVersion.parse(code);
+        const parts = codeUtils.js.parse(code);
         const deps = [];
         parts.forEach(part => {
           const { node } = part;
@@ -66,26 +67,78 @@ plugins = module.exports = {
           type: 'script',
           code: `require('babel').transfrom(file.contents, {plugins:${plugs.join(', ')}})`
         };
+      },
+      getMinify() {
+        return {
+          type: 'script',
+          code: 'require("uglify-es").minify(file.contents).code'
+        };
+      },
+      generate(code) {
+        return {
+          js: `(function (module, exports, require) {
+            ${code}
+          })`,
+          html: `<script type="text/javascript">
+            ${code}
+          </script>`
+        };
+      },
+      consolidate(codes, main) {
+        return `;(function () {
+          var modules = {
+            ${Object.keys(codes).map(i => [i, codes[i]]).map(([i, v]) => `${i} : ${v}`).join(',\n')}
+          }
+          var exports;
+          function require(i) {
+            if (typeof modules[i] === 'string') {
+              return resolve(i);
+            }
+            return modules[i];
+          };
+          function resolve(i) {
+            exports = {};
+            modules[i] = modules[i]({main: ${main}, exports:exports}, exports, require).exports;
+            return modules[i]l
+          }
+          for (var i in modules) {
+            if (typeof modules[i] === 'string') {
+              resolve(i);
+            }
+          }
+        });`;
       }
     },
-    jsx: {
+    /* jsx: {
       getInstall(code) {
-        const parts = detectVersion.parse(code);
+        const parts = codeUtils.js.parse(code);
         return ['babel-core', 'babel-plugin-transform-jsx-react'].concat(babel.getPlugins(parts));
       },
       getDeps(code) {
         return plugins.extensions.js.getDeps(code);
       },
       getJob(code) {
-        return plugins.extensions.js.getJob(code, plugins.extensions.jsx.getInstall(code));
+        return plugins.extensions.js.getJob(code, plugins.extensions.jsx.getInstall(code).map(v => `'${v}'`));
+      },
+      generate(code) {
+        return {
+          js: `(function (module, exports, require) {
+            ${code}
+            return module;
+          })`,
+          jsx: code
+        };
+      },
+      consolide(codes) {
+
       }
-    },
+    }, */
     css: {
       getInstall() {
-        return ['postcss', 'postcss-use'];
+        return ['postcss', 'postcss-use', 'clean-css'];
       },
       getDeps(code) {
-        const { stylesheet: { rules } } = css.parse(code);
+        const { stylesheet: { rules } } = codeUtils.css.parse(code);
         const deps = [];
         rules.forEach(rule => {
           if (rule.type === 'import') {
@@ -123,20 +176,57 @@ plugins = module.exports = {
           type: 'script',
           code: 'require(\'postcss\')([require(\'postcss-use\')]).process(file.contents).then(res => {contents: res.css, map: res.map.toString()})' // eslint-disable-line
         };
+      },
+      getMinify() {
+        return {
+          type: 'script',
+          code: 'new (require("clean.css"))({inline: ["none"]}).minify(file.contents)'
+        };
+      },
+      generate(code) {
+        return {
+          css: code,
+          js: `(function () {return ${codeUtils.css.parse(code).stylesheet.rules}})`,
+          html: `<style media="screen">
+            ${code}
+          </style>`
+        };
+      },
+      consolidate(codes, main) {
+        const parsed = codeUtils.css.parse(codes[main]);
+        o.forEach(codes, (i, v) => {
+          if (i.contains('/')) {
+            const [selectors, prop] = i.split('/');
+            parsed.stylesheet.rules.forEach((rule, ri) => {
+              if (rule.selectors.join(' ') === selectors) {
+                rule.declarations.forEach((dec, di) => {
+                  if (prop === dec.property) {
+                    parsed.stylesheet.rules[ri].declarations[di].value = v;
+                  }
+                });
+              }
+            });
+          }
+        });
+        return [codeUtils.css.generate(parsed)]
+          .concat(Object.keys(codes).filter(v => v !== main).map(i => codes[i]))
+          .join('\n');
       }
     },
     html: {
       getInstall() {
-        return ['posthtml', 'posthtml-load-plugins'];
+        return ['posthtml', 'posthtml-load-plugins', 'html-minifier'];
       },
       getDeps(code) {
         const deps = [];
+        const counter = {};
         const parser = new htmlparser.Parser({
           onopentag(tag, atrs) {
+            counter[tag] = (counter[tag] || 0) + 1;
             if (tag === 'meta') {
               o.forEach(atrs, (i, v) => {
                 if (html.META[i] && html.META[i].includes(v)) {
-                  deps.push({ place: atrs.content, url: true, names: { '*': `${tag}/${i}` } });
+                  deps.push({ place: atrs.content, url: true, names: { '*': `meta/${counter.meta}/${i}` } });
                 }
               });
               return;
@@ -144,7 +234,7 @@ plugins = module.exports = {
             if (tag === 'img') {
               if (atrs.srcset) {
                 atrs.srcset.split(',').forEach((url, i) => {
-                  deps.push({ place: url, url: true, names: { '*': `${tag}/${i}` } });
+                  deps.push({ place: url, url: true, names: { '*': `img/${counter.img}/srcset/${i}` } });
                 });
                 return;
               }
@@ -155,7 +245,7 @@ plugins = module.exports = {
                   const url = atrs[i];
                   if (!url) return;
                   if (url.lastIndexOf('.') < 1) return;
-                  deps.push({ place: url, url: true, names: { '*': t } });
+                  deps.push({ place: url, url: true, names: { '*': `${t}/${counter[tag]}` } });
                 }
               });
             });
@@ -171,15 +261,72 @@ plugins = module.exports = {
             type: 'script',
             code: `require('posthtml')(require('posthtml-load-plugins')(${res||"''"})).process(file.contents).then(res => {contents: res.html, map: res.map})` // eslint-disable-line
           }));
+      },
+      getMinify() {
+        return {
+          type: 'script',
+          code: 'require("html-minifier").minify(file.contents)'
+        };
+      },
+      generate(code) {
+        return {
+          html: code,
+          js: `\`${code}\``,
+          css: ''
+        };
+      },
+      consolidate(codes, main) {
+        const code = codes[main];
+        const parsed = htmlparser.parseDOM(code);
+        const counter = {};
+        return dutils.getOuterHTML(html.walk(parsed, node => {
+          if (node.type === 'tag') {
+            counter[node.name] = (counter[node.name] || 0) + 1;
+            o.forEach(codes, (i, v) => {
+              if (i === main) return;
+              const p = i.split('/');
+              if (p[0] === node.name && p[1] === counter[node.name]) {
+                if (node.name === 'meta') {
+                  node.attribs[p[2]] = v;
+                  return;
+                }
+                if (node.name === 'img' && p[2] === 'srcset') {
+                  const arr = node.attribs.srcset.split(',');
+                  arr[p[3]] = v;
+                  node.attribs.srcet = arr.join(',');
+                  return;
+                }
+                node = htmlparser.parseDOM(v);
+              }
+            });
+          }
+          return node;
+        }));
       }
     },
     htm: is('html'),
     png: {
       getInstall: arr,
       getDeps: arr,
-      getJob: () => ({ type: 'script', code: '' })
+      getJob: () => ({ type: 'script', code: 'file' }),
+      getMinify: () => ({ type: 'script', code: 'file' }),
+      generate: url => ({
+        html: url,
+        css: `url(${url})`,
+        js: `(function () {return ${url}})`
+      }),
+      url: true
     },
     jpg: is('png'),
     jpeg: is('jpg')
   }
 };
+
+module.exports = new Proxy(plugins, {
+  get(key) {
+    if (plugins[key]) {
+      return plugins[key];
+    }
+    return plugins.extensions[key];
+  }
+});

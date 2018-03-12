@@ -23,8 +23,11 @@
   "bugs": {
     "url": "https://github.com/legodude17/slipy/issues"
   },
+  "description": "Fast and easy to use build tool",
   "homepage": "https://github.com/legodude17/slipy#readme",
   "dependencies": {
+    "babel-traverse": "^6.26.0",
+    "babylon": "^6.18.0",
     "caniuse-api": "^2.0.0",
     "css": "^2.2.1",
     "del": "^3.0.0",
@@ -39,7 +42,10 @@
     "minimist": "^1.2.0",
     "pify": "^3.0.0",
     "postcss-value-parser": "^3.3.0",
-    "yargs": "^11.0.0"
+    "ws": "^5.0.0",
+    "bufferutil": "^3.0.3",
+    "utf-8-validate": "^4.0.0",
+    "chokidar": "^2.0.2"
   },
   "devDependencies": {
     "eslint": "^4.18.1",

@@ -54,6 +54,7 @@ exports.META = {
 };
 
 const fs = require('../util/fs');
+const { mergeNot: merge } = require('../util/objects');
 
 function checkPackageJson() {
   return fs.readFile('package.json', 'utf-8')
@@ -63,4 +64,21 @@ function checkPackageJson() {
 exports.getPlugConfig = function pc() {
   return Promise.all(['posthtml.js', 'posthtml.json'].map(fs.exists))
     .then(res => (res.filter(Boolean).length ? res[0] : checkPackageJson()));
+};
+
+exports.walk = function walk(dom, visitor) {
+  visitor(dom);
+  function innerWalk(node) {
+    const oNode = merge(
+      node,
+      {},
+      ['children', 'prev', 'next', 'parent'],
+      a => a
+    );
+    if (!node.children) return visitor(oNode);
+    visitor(oNode);
+    oNode.children = node.children.map(innerWalk);
+    return oNode;
+  }
+  return dom.map(innerWalk);
 };

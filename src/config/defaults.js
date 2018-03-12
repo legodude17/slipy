@@ -8,5 +8,6 @@ module.exports = {
   pluginConfig: {},
   defaultEnv: 'development',
   serveUrl: '/',
-  jobs: 8
+  jobs: 8,
+  buildDir: 'build'
 };

@@ -1,3 +1,8 @@
+function defaultMerge(v1, v2) {
+  if (Array.isArray(v1)) return v1.concat(v2);
+  return v1 || v2;
+}
+
 const objects = module.exports = {
   defaults(obj, keys, value = {}) {
     let o = obj;
@@ -7,20 +12,22 @@ const objects = module.exports = {
     objects.default(o, keys[keys.length - 1], value);
     return o;
   },
-  merge(obj, srcObj, fn = objects.defualtMerge) {
+  merge(obj, srcObj, fn = defaultMerge) {
     return objects.map(obj, (i, v) => fn(v, srcObj[i], i));
   },
-  mergeDeep(obj, srcObj, fn = objects.defualtMerge) {
+  mergeDeep(obj, srcObj, fn = defaultMerge) {
     return objects.map(obj, (idx, value) => {
       const maybeRes = fn(value, srcObj[idx], idx);
-      if (typeof maybeRes !== 'object') return maybeRes;
+      if (typeof maybeRes !== 'object' || !maybeRes) return maybeRes;
       if (Array.isArray(maybeRes) && fn([1], [2]).length !== 1) return maybeRes;
-      return objects.mergeDeep(maybeRes, srcObj[idx], fn);
+      return objects.mergeDeep(maybeRes, srcObj[idx] || {}, fn);
     });
   },
-  defaultMerge(v1, v2) {
-    if (Array.isArray(v1)) return v1.concat(v2);
-    return v1 || v2;
+  mergeNot(obj, srcObj, props, fn = defaultMerge) {
+    return objects.mergeDeep(obj, srcObj, (a, b, i) => {
+      if (props.includes(i)) return null;
+      return fn(a, b, i);
+    });
   },
   default(obj, key, value = {}) {
     if (obj[key] == null) {
