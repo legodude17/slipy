@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/slipy.js",
   "bin": {
-    "slipy": "index.js"
+    "slipy": "cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -9,14 +9,14 @@ module.exports = function watch(port, opts) {
   const { buildDir } = opts;
   const s = server.create(port, opts.serveUrl);
   const w = watcher.create();
-  let { graph } = opts;
+  const { graph } = opts;
   building.init(opts.jobs);
 
   watcher.change(w, file => deps.updateFile(graph, file)
-    .then(([newFiles, newGraph]) => { w.add(newFiles); graph = newGraph; return newGraph; })
-    .then(g => building.transform(g))
+    .then(newFiles => w.add(newFiles))
+    .then(() => building.transform(graph))
     .then(g => building.consolidate(g))
-    .then(g => server.addReload(g, s))
+    .then(g => server.addReload(s, g))
     .then(newGraph => building.write(newGraph, buildDir))
     .then(() => server.reload(s)));
 

@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 module.exports = {
   getLike(str, strs) {
     let like = strs;
@@ -11,5 +13,10 @@ module.exports = {
     }
     if (i >= str.length) return like;
     return prevLike;
+  },
+  hash(string) {
+    const h = crypto.createHash('md5');
+    h.update(string);
+    return h.digest('hex');
   }
 };

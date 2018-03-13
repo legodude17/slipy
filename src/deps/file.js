@@ -50,5 +50,8 @@ const files = module.exports = {
       file: basicFile.create({ path: file.file.path }),
       deps: file.deps
     };
+  },
+  verify(file, hash) {
+    return fs.hash(file.file.path).then(h => h === hash);
   }
 };

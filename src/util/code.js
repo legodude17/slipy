@@ -1,16 +1,10 @@
-const crypto = require('crypto');
 const babylon = require('babylon');
 const traverse = require('babel-traverse');
 const generate = require('babel-generate');
 const css = require('css');
+const { hash } = require('./strings');
 
 const cache = new Map();
-
-function hash(code) {
-  const h = crypto.createHash('md5');
-  h.update(code);
-  return h.digest('hex');
-}
 
 function parse(code, parser) {
   const h = hash(code);

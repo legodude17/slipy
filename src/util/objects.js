@@ -64,5 +64,8 @@ const objects = module.exports = {
     const res = [];
     arr.forEach(v => res.includes(v) || res.push(v));
     return res;
+  },
+  diffArr(arr1, arr2) {
+    return arr1.concat(arr2).filter(v => !(arr1.includes(v) && arr2.includes(v)));
   }
 };

@@ -13,6 +13,7 @@ const building = module.exports = {
   },
   transform(g) {
     const newGraph = deps.createGraph(g.entry.file.path);
+    newGraph.cache = g.cache;
     return Promise.all(Object.keys(g.files)
       .map(i => g.files[i])
       .map(file => workers.run(building.manager, { work: file.processed.work, file: file.file }).then(() => file)))
@@ -22,6 +23,7 @@ const building = module.exports = {
   consolidate(g) {
     const entryExt = path.extname(g.entry.file.path).slice(1);
     const newGraph = deps.createGraph(g.entry.file.path);
+    newGraph.cache = g.cache;
     return plugs.extensions[entryExt].consolidate(g.entry.deps
       .map(dep => building.consolidate(deps.getSubGraph(g, dep)))
       .map(graph => plugs[graph.entry.file.path].consolidate(
@@ -40,6 +42,7 @@ const building = module.exports = {
   },
   minify(g) {
     const newGraph = deps.createGraph(g.entry.file.path);
+    newGraph.cache = g.cache;
     return Promise.all(Object.keys(g.files)
       .map(i => g.files[i])
       .map(file => workers.run(

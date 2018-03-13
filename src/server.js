@@ -1,6 +1,7 @@
 const http = require('http');
 const URL = require('url');
 const ws = require('ws');
+const path = require('path');
 
 const server = module.exports = {
   create(port, url) {
@@ -25,16 +26,18 @@ const server = module.exports = {
   reload(s) {
     s.socket.send('reload');
   },
-  addReload(g, s) {
+  addReload(s, g) {
+    if (path.extname(g.entry.file.path) !== '.html') return;
     const i = g.entry.file.contents.indexOf('<head>') + 6;
     g.entry.file.contents = g.entry.file.contents.slice(0, i) + server.getCode(s) + g.entry.file.contents.slice(i);
   },
   start(s) {
     return new Promise((res, rej) => {
       s.server.listen(s.port);
-      s.server.on('listening', () => {
-        s.ws.on('connection', socket => { s.socket = socket; res(s); });
-      });
+      s.server.on('listening', () => s.ws.on('connection', socket => {
+        s.socket = socket;
+        return res(s);
+      }));
       s.server.on('error', rej);
       s.ws.on('error', rej);
     });
