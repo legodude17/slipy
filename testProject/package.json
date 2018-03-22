@@ -1,1 +1,12 @@
-{}
+{
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "clean-css": "^4.1.11",
+    "html-minifier": "^3.5.11",
+    "postcss": "^6.0.20",
+    "postcss-use": "^3.0.0",
+    "posthtml": "^0.11.3",
+    "posthtml-load-plugins": "^0.11.8",
+    "uglify-es": "^3.3.9"
+  }
+}

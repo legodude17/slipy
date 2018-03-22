@@ -35,7 +35,7 @@ plugins = {
         if (!babel.isBabelNeeded(parts)) {
           return [];
         }
-        return ['babel-core', 'uglify-es'].concat(babel.getPlugins(parts));
+        return ['babel-core', 'uglify-es'].concat(babel.getPackages(parts));
       },
       getDeps(code) {
         const parts = codeUtils.js.parse(code);
@@ -61,11 +61,11 @@ plugins = {
         });
         return deps;
       },
-      getJob(code, plugs = plugins.extensions.js.getInstall(code).map(v => `'${v}'`)) {
-        if (!plugs.length) return { type: 'script', code: '' };
+      getJob(code, plugs = plugins.extensions.js.getInstall(code).slice(2).map(v => `'${v}'`)) {
+        if (!plugs.length) return { type: 'script', code: 'file;' };
         return {
           type: 'script',
-          code: `require('babel').transfrom(file.contents, {plugins:${plugs.join(', ')}})`
+          code: `require('babel-core').transform(file.contents, {plugins:[${plugs.join(', ')}]})`
         };
       },
       getMinify() {
@@ -109,30 +109,6 @@ plugins = {
         });`;
       }
     },
-    /* jsx: {
-      getInstall(code) {
-        const parts = codeUtils.js.parse(code);
-        return ['babel-core', 'babel-plugin-transform-jsx-react'].concat(babel.getPlugins(parts));
-      },
-      getDeps(code) {
-        return plugins.extensions.js.getDeps(code);
-      },
-      getJob(code) {
-        return plugins.extensions.js.getJob(code, plugins.extensions.jsx.getInstall(code).map(v => `'${v}'`));
-      },
-      generate(code) {
-        return {
-          js: `(function (module, exports, require) {
-            ${code}
-            return module;
-          })`,
-          jsx: code
-        };
-      },
-      consolide(codes) {
-
-      }
-    }, */
     css: {
       getInstall() {
         return ['postcss', 'postcss-use', 'clean-css'];
@@ -174,13 +150,13 @@ plugins = {
       getJob() {
         return {
           type: 'script',
-          code: 'require(\'postcss\')([require(\'postcss-use\')]).process(file.contents).then(res => {contents: res.css, map: res.map.toString()})' // eslint-disable-line
+          code: 'require(\'postcss\')([require(\'postcss-use\')('*')], {from: undefined}).process(file.contents).then(res => ({contents: res.css, map: res.map.toString()}))' // eslint-disable-line
         };
       },
       getMinify() {
         return {
           type: 'script',
-          code: 'new (require("clean.css"))({inline: ["none"]}).minify(file.contents)'
+          code: 'new (require("clean-css"))({inline: ["none"]}).minify(file.contents)'
         };
       },
       generate(code) {
@@ -195,7 +171,7 @@ plugins = {
       consolidate(codes, main) {
         const parsed = codeUtils.css.parse(codes[main]);
         o.forEach(codes, (i, v) => {
-          if (i.contains('/')) {
+          if (i.includes('/')) {
             const [selectors, prop] = i.split('/');
             parsed.stylesheet.rules.forEach((rule, ri) => {
               if (rule.selectors.join(' ') === selectors) {
@@ -259,7 +235,7 @@ plugins = {
         return html.getPlugConfig()
           .then(res => ({
             type: 'script',
-            code: `require('posthtml')(require('posthtml-load-plugins')(${res||"''"})).process(file.contents).then(res => {contents: res.html, map: res.map})` // eslint-disable-line
+            code: res ?  `require('posthtml')(require('posthtml-load-plugins')(${res})).process(file.contents).then(res => ({contents: res.html, map: res.map}))` : 'file;' // eslint-disable-line
           }));
       },
       getMinify() {
@@ -308,8 +284,8 @@ plugins = {
     png: {
       getInstall: arr,
       getDeps: arr,
-      getJob: () => ({ type: 'script', code: 'file' }),
-      getMinify: () => ({ type: 'script', code: 'file' }),
+      getJob: () => ({ type: 'script', code: 'file;' }),
+      getMinify: () => ({ type: 'script', code: 'file;' }),
       generate: url => ({
         html: url,
         css: `url(${url})`,
@@ -323,7 +299,7 @@ plugins = {
 };
 
 module.exports = new Proxy(plugins, {
-  get(key) {
+  get(obj, key) {
     if (plugins[key]) {
       return plugins[key];
     }

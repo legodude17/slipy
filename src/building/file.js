@@ -1,6 +1,6 @@
 const fs = require('../util/fs');
 const o = require('../util/objects.js');
-const path = require('path');
+// const path = require('path');
 
 const file = module.exports = {
   create(arg1, arg2, arg3) {
@@ -20,12 +20,13 @@ const file = module.exports = {
       .then(v => { file.contents = v; });
   },
   write(file) {
-    return fs.writeFile(file.path, file.contents)
-      .catch(() =>
-        fs.mkdirp(path.dirname(file.path))
-          .then(() => fs.writeFile(file.path, file.contents)));
+    return fs.w(file.path, file.contents);
   },
   is(file) {
-    return o.hasOnly(file, ['contents', 'path', 'map']);
+    return file && o.hasOnly(file, ['contents', 'path', 'map']);
+  },
+  read(file) {
+    return fs.readFile(file.path, 'utf8')
+      .then(v => Object.assign({}, file, { contents: v }));
   }
 };

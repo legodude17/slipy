@@ -1,6 +1,6 @@
 const babylon = require('babylon');
-const traverse = require('babel-traverse');
-const generate = require('babel-generate');
+const { default: traverse } = require('babel-traverse');
+const generate = require('babel-generator');
 const css = require('css');
 const { hash } = require('./strings');
 

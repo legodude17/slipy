@@ -28,13 +28,18 @@ function getInstaller(deps) {
   };
 }
 
+function normalizeDep(dep, folder) {
+  if (path.isAbsolute(dep)) return dep;
+  return path.relative(process.cwd(), path.resolve(folder, dep));
+}
+
 module.exports = function getDeps(file) {
-  const plug = plugs.extensions[path.extname(file).slice(1)];
+  const plug = plugs[path.extname(file).slice(1)];
   if (!plug) throw new Error(`Unrecognized file ${file}, ${path.extname(file).slice(1)}`);
   return fs.readFile(file, 'utf-8')
     .then(contents => plug.getDeps(contents))
     .then(deps => ({
-      deps: deps.map(dep => dep.place),
+      deps: deps.map(dep => normalizeDep(dep.place, path.dirname(file))),
       assigns: getAssigns(deps),
       install: getInstaller(deps)
     }));

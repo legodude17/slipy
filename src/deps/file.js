@@ -42,16 +42,28 @@ const files = module.exports = {
   serialize(file) {
     return {
       file: basicFile.create({ path: file.file.path }),
-      deps: file.deps
+      deps: file.deps,
+      processed: file.processed,
+      assignMap: file.assignMap
     };
   },
   deserialize(file) {
     return {
       file: basicFile.create({ path: file.file.path }),
-      deps: file.deps
+      deps: file.deps,
+      processed: file.processed,
+      install: _ => _,
+      assignMap: file.assignMap
     };
   },
   verify(file, hash) {
-    return fs.hash(file.file.path).then(h => h === hash);
+    return fs.hash(file.file.path).then(h => (h === hash ? file : false));
+  },
+  write(file) {
+    return basicFile.write(file.file);
+  },
+  read(file) {
+    return basicFile.read(file.file)
+      .then(f => Object.assign({}, file, { file: f }));
   }
 };

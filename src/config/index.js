@@ -1,6 +1,7 @@
 const fs = require('../util/fs');
 const object = require('../util/objects');
 const configDefaults = require('./defaults');
+const { dg } = require('../deps');
 
 const config = module.exports = {
   loadConfig() {
@@ -10,7 +11,8 @@ const config = module.exports = {
       .then(obj => object.mergeDeep(obj, configDefaults));
   },
   loadGraph() {
-    return fs.readFile('.cache/depgraph.json')
+    return fs.readFile('.cache/depgraph.json', 'utf-8')
+      .then(str => dg.deserialize(str))
       .catch(() => new Error('No graph'));
   },
   load() {

@@ -49,17 +49,17 @@ const workers = module.exports = {
         return;
       }
       const message = JSON.parse(messageStr);
-      const job = jobs[message.type].deserialize(message.job);
-      worker.currentJob = null;
       if (message.error) {
-        const { error } = message;
+        const { error, job } = message;
         worker.manager.erroredJobs.push(job);
         worker.manager.events.emit('error', error, job);
-      } else {
-        worker.events.emit('jobDone', message.result, job);
-        worker.manager.doneJobs.push(job);
-        worker.manager.events.emit('jobDone', message.result, job);
+        return;
       }
+      const job = jobs[message.type].deserialize(message.job);
+      worker.currentJob = null;
+      worker.events.emit('jobDone', message.result, job);
+      worker.manager.doneJobs.push(job);
+      worker.manager.events.emit('jobDone', message.result, job);
       worker.manager.currentJobs.forEach((j, i) => j.id === job.id && worker.manager.currentJobs.splice(i, 1));
       workers.distributeJobs(worker.manager);
     };
@@ -72,7 +72,7 @@ const workers = module.exports = {
     workers.distributeJobs(man);
   },
   distributeJobs(man) {
-    while (man.currentJobs.length < man.workers.length) {
+    while ((man.currentJobs.length < man.workers.length) && man.jobQueue.length) {
       workers.startNextJob(man);
     }
   },
@@ -87,9 +87,11 @@ const workers = module.exports = {
     if (!job.id) {
       job.id = Date.now().toString() + Math.random();
     }
+    // console.log('run', job.file.path);
     return new Promise(((resolve, reject) => {
       function onJobDone(result, maybeJob) {
         if (maybeJob.id === job.id) {
+          // console.log('job', job.file.path, 'done');
           resolve(result);
           man.events.removeListener('jobDone', onJobDone);
           man.events.removeListener('error', onJobError); // eslint-disable-line no-use-before-define

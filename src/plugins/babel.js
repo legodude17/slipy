@@ -30,6 +30,6 @@ const babel = module.exports = {
   }, */
   isBabelNeeded(parts) {
     const versions = parts.map(part => part.version);
-    return !(versions.includes('2015') || versions.includes('2016') || versions.inclides('proposal'));
+    return !(versions.includes('2015') || versions.includes('2016') || versions.includes('proposal'));
   }
 };

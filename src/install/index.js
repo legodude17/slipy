@@ -16,7 +16,7 @@ function editPackageJSON(json, packageName) {
     if (obj.slipy.plugins[key]) {
       obj.slipy.plugins[key] = Array.isArray(obj.slipy.plugins[key]) ? obj.slipy.plugins[key].concat(packageName) : [obj.slipy.plugins[key], packageName]; //eslint-disable-line
     } else {
-      obj.slipy.plugins[key] = packageName;
+      obj.slipy.plugins[key] = [packageName];
     }
     return obj;
   };

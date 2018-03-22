@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('../util/fs');
 const URL = require('url');
+const dns = require('dns');
 
 const get = module.exports = function get(place) {
   try {
@@ -49,4 +50,20 @@ get.json = function getJson(place) {
         rej(new Error('Not JSON'));
       }
     }));
+};
+
+get.hasInternet = function hasInternet() {
+  return new Promise((res, rej) => {
+    dns.lookup('google.com', err => {
+      if (err) {
+        if (err.code === 'ENOTFOUND') {
+          res(false);
+        } else {
+          rej(err);
+        }
+      } else {
+        res(true);
+      }
+    });
+  });
 };

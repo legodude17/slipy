@@ -58,7 +58,7 @@ const { mergeNot: merge } = require('../util/objects');
 
 function checkPackageJson() {
   return fs.readFile('package.json', 'utf-8')
-    .then(res => (JSON.parse(res).posthtml ? 'package.json' : new Error('Not found')));
+    .then(res => (JSON.parse(res).posthtml ? 'package.json' : false));
 }
 
 exports.getPlugConfig = function pc() {

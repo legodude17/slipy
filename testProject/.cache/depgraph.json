@@ -1,0 +1,199 @@
+{
+  "entry": {
+    "file": {
+      "contents": "",
+      "path": "app/index.html",
+      "map": ""
+    },
+    "deps": [
+      "app/styles.css",
+      "app/script.js"
+    ],
+    "processed": {
+      "install": [
+        "posthtml",
+        "posthtml-load-plugins",
+        "html-minifier"
+      ],
+      "work": {
+        "type": "script",
+        "code": "file;"
+      },
+      "path": "app/index.html"
+    },
+    "assignMap": {
+      "link/1": "styles.css/*",
+      "script/1": "script.js/*"
+    }
+  },
+  "files": {
+    "app/index.html": {
+      "file": {
+        "contents": "",
+        "path": "app/index.html",
+        "map": ""
+      },
+      "deps": [
+        "app/styles.css",
+        "app/script.js"
+      ],
+      "processed": {
+        "install": [
+          "posthtml",
+          "posthtml-load-plugins",
+          "html-minifier"
+        ],
+        "work": {
+          "type": "script",
+          "code": "file;"
+        },
+        "path": "app/index.html"
+      },
+      "assignMap": {
+        "link/1": "styles.css/*",
+        "script/1": "script.js/*"
+      }
+    },
+    "app/styles.css": {
+      "file": {
+        "contents": "",
+        "path": "app/styles.css",
+        "map": ""
+      },
+      "deps": [
+        "app/a.css",
+        "app/b.css",
+        "app/back.png"
+      ],
+      "processed": {
+        "install": [
+          "postcss",
+          "postcss-use",
+          "clean-css"
+        ],
+        "work": {
+          "type": "script",
+          "code": null
+        },
+        "path": "app/styles.css"
+      },
+      "assignMap": {
+        ".a/background": "./back.png/*"
+      }
+    },
+    "app/script.js": {
+      "file": {
+        "contents": "",
+        "path": "app/script.js",
+        "map": ""
+      },
+      "deps": [
+        "app/index.html"
+      ],
+      "processed": {
+        "install": [
+          "babel-core",
+          "uglify-es"
+        ],
+        "work": {
+          "type": "script",
+          "code": "file;"
+        },
+        "path": "app/script.js"
+      },
+      "assignMap": {
+        "a": "./index.html/*"
+      }
+    },
+    "app/a.css": {
+      "file": {
+        "contents": "",
+        "path": "app/a.css",
+        "map": ""
+      },
+      "deps": [
+        "app/b.css",
+        "app/hi.png"
+      ],
+      "processed": {
+        "install": [
+          "postcss",
+          "postcss-use",
+          "clean-css"
+        ],
+        "work": {
+          "type": "script",
+          "code": null
+        },
+        "path": "app/a.css"
+      },
+      "assignMap": {
+        ".b/background": "./hi.png/*"
+      }
+    },
+    "app/b.css": {
+      "file": {
+        "contents": "",
+        "path": "app/b.css",
+        "map": ""
+      },
+      "deps": [],
+      "processed": {
+        "install": [
+          "postcss",
+          "postcss-use",
+          "clean-css"
+        ],
+        "work": {
+          "type": "script",
+          "code": null
+        },
+        "path": "app/b.css"
+      },
+      "assignMap": {}
+    },
+    "app/back.png": {
+      "file": {
+        "contents": "",
+        "path": "app/back.png",
+        "map": ""
+      },
+      "deps": [],
+      "processed": {
+        "install": [],
+        "work": {
+          "type": "script",
+          "code": "file;"
+        },
+        "path": "app/back.png"
+      },
+      "assignMap": {}
+    },
+    "app/hi.png": {
+      "file": {
+        "contents": "",
+        "path": "app/hi.png",
+        "map": ""
+      },
+      "deps": [],
+      "processed": {
+        "install": [],
+        "work": {
+          "type": "script",
+          "code": "file;"
+        },
+        "path": "app/hi.png"
+      },
+      "assignMap": {}
+    }
+  },
+  "cache": {
+    "app/index.html": "b5af1b6a2de69b45da2f8a7e2eca76ab",
+    "app/styles.css": "ef5ca89c48056a57ac85cf70568906e2",
+    "app/script.js": "9bdf07b8c44ca27863b1fa4d79696488",
+    "app/a.css": "91d72d8cb7b204d103f9f2f61f393050",
+    "app/b.css": "81093d3d19476e223b2f3b9ff4c38c50",
+    "app/back.png": "ebc534d016768ce95121e0b82d1796d5",
+    "app/hi.png": "5c8ef322870fb6808791e900035e2652"
+  }
+}

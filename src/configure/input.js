@@ -1,8 +1,9 @@
 const { prompt } = require('inquirer');
 const o = require('../util/objects');
+const { hasInternet } = require('../util/get');
 
 module.exports = function input(graph) {
-  return prompt([{
+  return hasInternet().then(hasI => prompt([{
     type: 'confirm',
     name: 'save',
     message: 'Can I save the dependency graph to disk? (It will significantly speed up builds)'
@@ -12,6 +13,7 @@ module.exports = function input(graph) {
     .map(pkg => ({
       type: 'confirm',
       name: `install-${pkg}`,
-      message: `Can I install the package ${pkg} that I have detected you need?`
-    })))).then(input => [input, graph]);
+      message: `Can I install the package ${pkg} that I have detected you need?`,
+      default: hasI
+    }))))).then(input => [input, graph]);
 };

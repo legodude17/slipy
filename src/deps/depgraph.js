@@ -1,5 +1,5 @@
 const file = require('./file');
-const path = require('path');
+// const path = require('path');
 const o = require('../util/objects');
 const { hash } = require('../util/strings');
 
@@ -12,6 +12,7 @@ const depgraph = module.exports = {
     return {
       version: 2,
       entry,
+      cwd: process.cwd(),
       files: { [entrypath]: entry },
       cache: { [entrypath]: '' }
     };
@@ -21,7 +22,7 @@ const depgraph = module.exports = {
       .then(file => {
         depgraph.cache(graph, file);
         graph.entry = graph.files[file.file.path];
-        return file.deps.forEach(p => depgraph.addDep(graph, path.join(path.dirname(file.file.path), p)));
+        return file.deps.forEach(p => depgraph.addDep(graph, p));
       });
   },
   resolveAll(graph) {
@@ -29,7 +30,7 @@ const depgraph = module.exports = {
       return Promise.all(depgraph.getTasks(graph))
         .then(fs =>
           fs.reduce((arr, f) =>
-            arr.concat(f.deps.map(p => depgraph.addDep(graph, path.join(path.dirname(f.file.path), p)))), []));
+            arr.concat(f.deps.map(p => depgraph.addDep(graph, p))), []));
     }
     return Promise.resolve(true);
   },
@@ -59,7 +60,7 @@ const depgraph = module.exports = {
       entry: file.serialize(graph.entry),
       files: o.map(graph.files, (i, v) => file.serialize(v)),
       cache: graph.cache
-    });
+    }, null, 2);
   },
   deserialize(graphStr) {
     return o.map(JSON.parse(graphStr), (i, v) => {
@@ -76,8 +77,9 @@ const depgraph = module.exports = {
     o.forEach(analysation, (i, v) => { graph.files[i].processed = v; });
     return graph;
   },
-  getSubGraph(graph, f) {
-    const subGraph = depgraph.createGraph(f.path);
+  getSubGraph(graph, fpath) {
+    const f = graph.files[fpath];
+    const subGraph = depgraph.createGraph(f.file.path);
     let filesToAdd = Object.keys(subGraph.files).filter(i => !subGraph.files[i]);
     subGraph.entry = f;
     f.deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
@@ -114,7 +116,7 @@ const depgraph = module.exports = {
     return depgraph.getToUpdate(graph)
       .then(toUpdate => Object.keys(graph.files)
         .forEach(graph.files, i => {
-          newGraph.files[i] = toUpdate.includes(i) ? null : graph.files(i);
+          newGraph.files[i] = toUpdate.map(f => f.file.path).includes(i) ? null : graph.files[i];
         }))
       .then(() => depgraph.resolve(newGraph));
   },
@@ -126,5 +128,8 @@ const depgraph = module.exports = {
   },
   isFileNecessary(graph, file) {
     return Object.keys(graph.files).map(i => graph.files[i]).reduce((b, f) => (b || f.deps.includes(file)), false);
+  },
+  write(graph) {
+    return Promise.all(Object.keys(graph.files).map(i => graph.files[i]).map(file.write));
   }
 };
