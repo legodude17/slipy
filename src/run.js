@@ -7,7 +7,7 @@ module.exports = function run(port, opts) {
   let { graph } = opts;
   building.init(opts.jobs);
 
-  server.listen(req => deps.recalcGraph(graph)
+  server.listen(s, req => deps.recalcGraph(graph)
     .then(g => { graph = g; return g; })
     .then(g => building.buildToString(g, req.localPath)));
 

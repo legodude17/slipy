@@ -88,7 +88,7 @@
         "map": ""
       },
       "deps": [
-        "app/index.html"
+        "app/back.png"
       ],
       "processed": {
         "install": [
@@ -102,7 +102,7 @@
         "path": "app/script.js"
       },
       "assignMap": {
-        "a": "./index.html/*"
+        "a": "./back.png/*"
       }
     },
     "app/a.css": {
@@ -190,7 +190,7 @@
   "cache": {
     "app/index.html": "b5af1b6a2de69b45da2f8a7e2eca76ab",
     "app/styles.css": "ef5ca89c48056a57ac85cf70568906e2",
-    "app/script.js": "9bdf07b8c44ca27863b1fa4d79696488",
+    "app/script.js": "ee1d1b1365bea89bce27f6e86bdc905b",
     "app/a.css": "91d72d8cb7b204d103f9f2f61f393050",
     "app/b.css": "81093d3d19476e223b2f3b9ff4c38c50",
     "app/back.png": "ebc534d016768ce95121e0b82d1796d5",

@@ -67,5 +67,16 @@ const objects = module.exports = {
   },
   diffArr(arr1, arr2) {
     return arr1.concat(arr2).filter(v => !(arr1.includes(v) && arr2.includes(v)));
+  },
+  mapDeep(obj, fn) {
+    function doMap(obj) {
+      const o = {};
+      Object.keys(obj).forEach(v => {
+        if (typeof obj[v] === 'object' && obj[v]) o[v] = doMap(obj[v]);
+        o[v] = fn(v, obj[v], obj);
+      });
+      return o;
+    }
+    return doMap(obj);
   }
 };

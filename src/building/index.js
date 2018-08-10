@@ -1,10 +1,11 @@
 const workers = require('./workers');
 const { dg: deps } = require('../deps');
-// const dg = require('../util/deps');
 const plugs = require('../plugins/plugins');
 const path = require('path');
 const o = require('../util/objects');
 const dFile = require('../deps/file');
+
+let depth = 0;
 
 const building = module.exports = {
   init(jobs) {
@@ -28,47 +29,61 @@ const building = module.exports = {
       .then(() => newGraph);
   },
   consolidate(g) {
-    console.log('graph is', g);
+    return deps.load(g).then(graph => building._consolidate(graph));
+  },
+  _consolidate(g) {
+    depth++;
     const entryExt = path.extname(g.entry.file.path).slice(1);
     const newGraph = deps.createGraph(g.entry.file.path);
     newGraph.cache = g.cache;
     const codes = {};
-    console.log('entry', g.entry.file.path, 'has', g.files);
-    console.log('deps are', g.entry.deps);
     if (g.entry.deps.length === 0) {
-      console.log('no deps');
       newGraph.entry.file.contents = g.entry.file.contents;
+      depth--;
       return newGraph;
     }
-    const temp = g.entry.deps.map(dep => { console.log('found', dep); return g.files[dep]; });
-    console.log('temp', temp, '.length', temp.length);
-    console.log('running with', temp);
-    temp.map(dep => [building.consolidate(deps.getSubGraph(g, dep.file.path)), dep])
-      .map(([graph, dep]) => [plugs[graph.entry.file.path].consolidate(
-        building.generate(dep, graph),
-        graph.entry.file.path
-      ), dep])
+    console.log('deps for:', g.entry.file.path, 'at depth', depth);
+    g.entry.deps
+      .map(dep => { console.log('dep:', dep); return dep; })
+      .map(dep => g.files[dep])
+      .map(dep => [building._consolidate(deps.getSubGraph(g, dep.file.path)), dep])
+      .map(([graph, dep]) => [
+        plugs[path.extname(dep.file.path).slice(1)].consolidate(
+          building.generate(dep, graph),
+          graph.entry.file.path
+        ),
+        dep])
       .forEach(([code, dep]) => {
         o.forEach(g.entry.assignMap, (i, v) => {
-          if (v.startsWith(dep.file.path)) codes[i] = code;
+          if (v
+            .replace(/^\.\//, '')
+            .startsWith(path.relative(path.dirname(g.entry.file.path), dep.file.path))
+          ) codes[i] = code;
         });
       });
     codes[g.entry.file.path] = plugs[entryExt].generate(g.entry.file.contents)[entryExt];
     newGraph.entry.file.contents = plugs[entryExt].consolidate(codes, g.entry.file.path);
+    depth--;
     return newGraph;
   },
   generate(dep, g) {
+    const entryExt = path.extname(dep.file.path).slice(1);
+    console.log('generating for:', dep.file.path, 'at depth', depth);
+    console.log('with files', Object.keys(g.files));
     const files = o.map(
       g.files,
-      (path, file, ext = path.extname(file.file.path).slice(1)) => plugs[ext]
-        .generate(plugs[ext].url ? path : file.file.contents)[ext]
+      (fpath, file, _, ext = path.extname(fpath).slice(1)) => {
+        console.log('ext:', ext, 'for', fpath, file.file.contents.length, 'at depth', depth);
+        if (ext !== 'png' && file.file.contents.length > 200000) throw new Error('BLEH');
+        return plugs[ext]
+          .generate(file.file.contents, fpath)[entryExt];
+      }
     );
     const codes = {};
     o.forEach(dep.assignMap, (i, v) => {
       if (v.startsWith(dep.file.path)) codes[i] = files[path.relative(path.dirname(dep.file.path), v.split('/')[0])];
     });
     codes[dep.file.path] = files[dep.file.path];
-    console.log(codes, files);
     return codes;
   },
   minify(g) {

@@ -2,6 +2,7 @@ const file = require('./file');
 // const path = require('path');
 const o = require('../util/objects');
 const { hash } = require('../util/strings');
+const util = require('util');
 
 const depgraph = module.exports = {
   plugins: {},
@@ -10,7 +11,7 @@ const depgraph = module.exports = {
     file.init(plugins);
     const entry = file.createFromPath(entrypath);
     return {
-      version: 2,
+      version: 3,
       entry,
       cwd: process.cwd(),
       files: { [entrypath]: entry },
@@ -80,15 +81,19 @@ const depgraph = module.exports = {
   getSubGraph(graph, fpath) {
     const f = graph.files[fpath];
     const subGraph = depgraph.createGraph(f.file.path);
-    let filesToAdd = Object.keys(subGraph.files).filter(i => !subGraph.files[i]);
+    let filesToAdd = f.deps.slice(0);
+    let filesToAddNext = [];
+    const filesAdded = [];
     subGraph.entry = f;
-    f.deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
+    const eacher = v => {
+      subGraph.files[v] = graph.files[v];
+      filesAdded.push(v);
+      subGraph.files[v].deps.forEach(dep => filesAdded.includes(dep) || filesToAddNext.push(dep));
+      return false;
+    };
     while (filesToAdd.length) {
-      filesToAdd.forEach(i => {
-        subGraph.files[i] = graph.files[i];
-        subGraph.files[i].deps.forEach(dep => { subGraph.files[dep] = graph.files[dep]; });
-      });
-      filesToAdd = Object.keys(subGraph.files).filter(i => !subGraph.files[i]);
+      filesToAdd = filesToAdd.filter(eacher).concat(filesToAddNext);
+      filesToAddNext = [];
     }
     return subGraph;
   },
@@ -131,5 +136,23 @@ const depgraph = module.exports = {
   },
   write(graph) {
     return Promise.all(Object.keys(graph.files).map(i => graph.files[i]).map(file.write));
+  },
+  load(graph) {
+    const newGraph = depgraph.createGraph(graph.entry.file.path);
+    return Promise.all(Object.keys(graph.files).map(i => file.read(graph.files[i])))
+      .then(files =>
+        files.forEach(v => {
+          if (v.file.path === graph.entry.file.path) {
+            newGraph.entry = newGraph.files[v.file.path] = v;
+          } else {
+            newGraph.files[v.file.path] = v;
+          }
+        }));
+  },
+  display(g) {
+    return util.inspect(
+      o.mapDeep(g, (i, v) => (typeof v === 'string' && v.length > 200000 ? '...' : v)),
+      { depth: null, colors: true }
+    );
   }
 };

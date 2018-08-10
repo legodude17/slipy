@@ -47,5 +47,8 @@ const server = module.exports = {
       var ws = new WebSocket(${s.ws.url});
       ws.onmessage = function (m) {if (m==='reload')location.reload()}
     })()`;
+  },
+  listen(s, listener) {
+    s.listener = listener;
   }
 };

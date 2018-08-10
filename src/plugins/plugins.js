@@ -169,12 +169,14 @@ plugins = {
         };
       },
       consolidate(codes, main) {
+        console.log('css consolidate:', codes[main].length, Object.keys(codes), Object.keys(codes).map(i => codes[i]).map(v => v.length).join(' '));
         const parsed = codeUtils.css.parse(codes[main]);
         o.forEach(codes, (i, v) => {
           if (i.includes('/')) {
             const [selectors, prop] = i.split('/');
             parsed.stylesheet.rules.forEach((rule, ri) => {
-              if (rule.selectors.join(' ') === selectors) {
+              if (rule.type === 'import') parsed.stylesheet.rules.splice(ri, 1);
+              if (rule.type === 'rule' && rule.selectors.join(' ') === selectors) {
                 rule.declarations.forEach((dec, di) => {
                   if (prop === dec.property) {
                     parsed.stylesheet.rules[ri].declarations[di].value = v;
@@ -185,7 +187,7 @@ plugins = {
           }
         });
         return [codeUtils.css.generate(parsed)]
-          .concat(Object.keys(codes).filter(v => v !== main).map(i => codes[i]))
+          .concat(Object.keys(codes).filter(v => v !== main).filter(v => !v.includes('/')).map(i => codes[i]))
           .join('\n');
       }
     },
@@ -286,12 +288,13 @@ plugins = {
       getDeps: arr,
       getJob: () => ({ type: 'script', code: 'file;' }),
       getMinify: () => ({ type: 'script', code: 'file;' }),
-      generate: url => ({
+      generate: (data, url) => ({
         html: url,
         css: `url(${url})`,
-        js: `(function () {return ${url}})`
+        js: `(function () {return ${url}})`,
+        png: data
       }),
-      url: true
+      consolidate: (codes, main) => codes[main]
     },
     jpg: is('png'),
     jpeg: is('jpg')
